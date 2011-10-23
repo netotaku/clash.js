@@ -72,16 +72,16 @@ clash.library.prototype.attachImages = function(images)
 	{
 		
 		var image = new Image();
-			image.onload = function(){
-				lib.countIn();
-			}
-			
-			image.onerror = function(){
-				console.debug('oops: Problem loading image.');
-			}
-			
-			image.src = images[i].src;												
-			images[i].data = image;
+		image.onload = function(){
+			lib.countIn();
+		}
+
+		image.onerror = function(){
+			console.debug('oops: Problem loading image.');
+		}
+
+		image.src = images[i].src;												
+		images[i].data = image;
 			
 	}
 		
@@ -151,7 +151,7 @@ clash.stage.prototype.onEnterFrame = function()
 	{
 	
 		var clip = this.movieClips[mc];	
-	
+
 		if(clip.playing) clip.onEnterFrame();			
 		if(clip._visible) clip.render(this.context);
 	
@@ -201,16 +201,16 @@ clash.stage.prototype.attachMovieClip = function(name, mc, config)
 	
 	if(typeof config == 'object') for(prop in config) mc[prop] = config[prop];
 
-    mc.onLoad();
+	mc.onLoad();
 
-    if(mc._attachment != false)
-    {
-                
+	if(mc._attachment != false)
+	{
+
 		mc._height = mc._attachment.height;		
-        mc._width = mc._attachment.width;    
-        
-    }
-		
+		mc._width = mc._attachment.width;    
+
+	}
+
     
 	this.movieClips[name] = mc;
 	

@@ -1,0 +1,226 @@
+<html>
+
+  <head>
+
+    <title>Clash.js</title>
+
+    <link href='http://fonts.googleapis.com/css?family=Geostar' rel='stylesheet' type='text/css'>
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript" src="source/clash.js"></script>
+    <script type="text/javascript">
+
+      $(document).bind("ready", function(){
+
+        var clips = [];
+
+        var library = new clash.library;
+          library.attachImages([
+            { name: 'ball', src: 'images/ball.png' }
+          ]);
+          library.onReady = function(){
+
+            $('#loading').html('');
+
+            var _root = new clash.stage('stage');
+
+            var ball = _root.attachMovieClip('ball', new clash.movieClip, {
+
+                startSpeed: function(){
+
+                  return Math.floor(Math.random()*2) ? -this.velocity : this.velocity;
+
+                },
+
+                onLoad: function(){
+
+                  this._attachment = library.get('ball');
+
+                  this._x = _root.width()/2 - this._attachment.width/2;
+                  this._y = _root.height()/2 - this._attachment.height/2;
+
+                  this.velocity = 5;
+                  this.Yspeed = this.startSpeed();
+                  this.Xspeed = this.startSpeed();
+
+
+                },
+
+                reverse: function(){
+
+                    this.Xspeed = (this.Xspeed < 0) ? this.velocity : -this.velocity;
+                    this.Yspeed = (this.Yspeed > 0) ? this.velocity : -this.velocity;
+
+                },
+
+                onEnterFrame: function(){
+
+                  if(this._y > (_root.height()-this._height)) this.Yspeed = -this.velocity;
+                  if(this._y < 0) this.Yspeed = this.velocity;
+
+                  if(this._x > (_root.width()-this._width)) this.Xspeed = -this.velocity;
+                  if(this._x < 0) this.Xspeed = this.velocity;
+
+                  for(var i = 0; i < players.length; i++)
+                  {
+
+                      var bat = players[i];
+
+                      if(this.hitTest(bat))
+                      {
+
+                        if(this._y < bat._y)
+                        {
+
+                          this.Yspeed = -this.velocity;
+
+                        } else if ((this._y+this._height) > (bat._y + bat._height)) {
+
+                          this.Yspeed = this.velocity;
+
+                        } else {
+
+                          this.reverse();
+
+                        }
+
+                      }
+                  }
+
+                  this._y += this.Yspeed;
+                  this._x += this.Xspeed;
+
+                }
+
+            });
+
+            var bar = new clash.movieClip;
+                bar._height = 5;
+                bar._width = _root.width();
+
+                _root.attachMovieClip('top', bar);
+                _root.duplicateMovieClip('bottom', bar, {
+                    onLoad: function(){
+                        this._y = _root.height() - this._height;
+                    }
+                });
+
+            var center = _root.attachMovieClip('center', new clash.movieClip, {
+                    _height: _root.height(),
+                    _x: (_root.width()/2)-1,
+                    _width: 2
+                });
+
+                // players ////////////////
+
+            var oneUp = _root.attachMovieClip('oneUp', new clash.movieClip, {
+
+                    velocity: 5,
+                    _height: 80,
+                    _width: 10,
+                    _color: '#fff',
+                    onLoad: function(){
+                        this._y = (_root.height()/2) - (this._height/2);
+                    },
+
+                    inRegion: function(){
+
+                        return ball._x-(ball._width/2) < _root.width()/2 ? true : false;
+
+                    },
+
+                    isTowards: function()
+                    {
+
+                        return ball.Xspeed < 0 ? true : false;
+
+                    },
+
+                    onEnterFrame: function()
+                    {
+
+                        var st = _root.height()/2;
+                        var bt = this._y+(this._height/2);
+                        var bl = ball._y-(ball._height/2);
+                        var sp = 0;
+
+                        if(this.isTowards() && this.inRegion() && ((ball._y-(this._height/2)) > 0) && ((ball._y+(this._height/2)) < _root.height())){
+
+                            sp = bl < bt ? -this.velocity : this.velocity;
+
+                        } /* else if (bt > st){
+
+                            sp = -2;
+
+                        } else if (bt < st){
+
+                            sp = 2;
+
+                        } */
+
+                        this._y += sp;
+
+                    }
+
+              });
+
+             var twoUp = _root.duplicateMovieClip('twoUp', oneUp, {
+
+                    inRegion: function(){
+
+                        return ball._x-(ball._width/2) > _root.width()/2 ? true : false;
+
+                    },
+
+                    isTowards: function()
+                    {
+
+                        return ball.Xspeed > 0 ? true : false;
+
+                    }
+
+                 });
+
+                 twoUp._x = _root.width() - twoUp._width;
+
+
+                 //////////
+
+             var players = [oneUp, twoUp];
+
+
+          }
+
+      });
+
+    </script>
+
+    <style type="text/css">
+
+      html
+      {
+
+        background: #666;
+
+      }
+
+      canvas
+      {
+
+        background: #333;
+
+      }
+
+    </style>
+
+  </head>
+
+  <body>
+
+    <canvas id="stage" width="400" height="300"></canvas>
+
+    <p><span id="loading">Loading ...</span></p>
+
+  </body>
+
+</html>
